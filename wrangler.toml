@@ -1,0 +1,11 @@
+compatibility_date = "2025-03-10"
+main = "src/index.ts"
+name = "max-artists"
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB" # available in your Worker on env.DB
+database_id = "local-database"
+database_name = "db"
