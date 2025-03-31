@@ -30,6 +30,7 @@ function getArtistPresentation(record: Record<string, unknown>): Record<string, 
   return presentation;
 }
 
+// Get release data in presentation format
 function getReleasePresentation(record: Record<string, unknown>): Record<string, unknown> {
   let presentation = {
     ...record
@@ -70,7 +71,7 @@ app.post("/artists", zValidator('json', z.object({
     console.log(record);
 
     // prep newly created artist record for presentation
-    const presentation = getArtistPresentation(record)
+    const presentation = getArtistPresentation(record);
 
     // return presentation
     return c.json(presentation, 200);
@@ -149,13 +150,19 @@ app.post("/releases", zValidator('json', z.object({
     console.log(record);
 
     // prep newly created release record for presentation
-    const presentation = getReleasePresentation(record)
+    const presentation = getReleasePresentation(record);
 
     // return presentation
     return c.json(presentation, 200);
   } catch (e: any) {
-    if (e instanceof Error && e.message.includes("UNIQUE constraint failed: releases.title")) {
-      throw new HTTPException(400, { message: "Title already exists in artist's releases" });
+    if (e instanceof Error) {
+      if (e.message.includes("UNIQUE constraint failed: releases.title")) {
+        throw new HTTPException(400, { message: "Title already exists in artist's releases" });
+      } else if (e.message.includes("FOREIGN KEY constraint failed")) {
+        throw new HTTPException(404, { message: "Could not find artist_id" });
+      }
+
+      throw e;
     }
     throw e;
   }
